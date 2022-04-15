@@ -1,0 +1,52 @@
+Data dapat diunduh di Kaggle.com (https://www.kaggle.com/datasets/ramjasmaurya/top-1000-social-media-channels
+
+# Library untuk dataframe dan visualisasi
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import datetime as dt
+#library untuk clustering
+import sklearn
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from scipy.cluster.hierarchy import linkage
+from scipy.cluster.hierarchy import dendrogram
+from scipy.cluster.hierarchy import cut_tree
+
+#Import Data
+from google.colab import files
+file = files.upload()
+
+#Membaca data
+data = pd.read_csv("social media influencers - youtube.csv")
+data.head()
+
+#Mengambil data yang berasal dari Inodenesia
+data1 = data[data['Audience Country']=='Indonesia']
+data1
+
+#Mendeteksi nilai null/kosong
+data1_null = round(100*(data1.isnull().sum())/len(data1),2)
+data1_null
+
+#Mengisi nilai kosong dengan rata-rata
+rata_likes = data1['avg likes'].mean()
+data1['avg likes'] = data1['avg likes'].fillna(rata_likes)
+data1['avg likes'].isna().sum()
+
+#Korelasi
+data2 = data1 [['Subscribers','avg views','avg likes']]
+data2.corr()
+plt.figure(figsize=(16,10))
+sns.heatmap(data2.corr(),annot=True);
+
+#Visualisasi
+data3=data1[['Subscribers','channel name']]
+plt.figure(figsize=(15,10))
+sns.barplot('Subscribers', 'channel name', data=data3)
+plt.title('Jumlah Subscribers', pad=20)
+plt.ylabel('Subscribers')
+plt.xlabel('Channel Name')
+plt.show()
