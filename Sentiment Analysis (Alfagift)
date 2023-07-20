@@ -1,0 +1,56 @@
+#SCRAPPING DATA
+pip install google-play-scraper
+from google_play_scraper import Sort, reviews
+alfa_reviews, continuation_token = reviews(
+    'com.alfamart.alfagift',
+    lang='id',
+    country='id',
+    sort=Sort.NEWEST,
+    count=2000,
+    filter_score_with=None
+)
+#PELABELAN
+with open("positif.txt") as pos_file:
+    positif_set = pos_file.read().splitlines()
+
+with open("negatif.txt") as neg_file:
+    negatif_set = neg_file.read().splitlines()
+positif_counter = SentimentCounter(positif_set, negatif_set)
+negatif_counter = SentimentCounter(negatif_set, positif_set)
+
+#WORDCLOUD
+# install wordcloud
+!pip install wordcloud
+from wordcloud import WordCloud
+import pandas as pd
+import numpy as np
+from PIL import Image
+import matplotlib.pyplot as plt
+
+!wget https://ik.imagekit.io/taw2awb5ntf/wp-content/uploads/2021/01/word-cloud-mask.jpg
+# save mask to alice_mask
+mask = np.array(Image.open('word-cloud-mask.jpg'))
+def transform_format(val):
+    if val == 0:
+       return 255
+    else:
+       return val
+transformed_mask = np.ndarray((mask.shape[0],mask.shape[1]),np.int32)
+for i in range(len(mask)):
+  transformed_mask[i] = list(map(transform_format, mask[i]))
+
+transformed_mask
+plt.imshow(transformed_mask)
+from wordcloud import WordCloud, ImageColorGenerator
+import matplotlib as mpl
+cmap = mpl.cm.Reds(np.linspace(0,1,20))
+cmap = mpl.colors.ListedColormap(cmap[10:,:-1])
+fig, (ax1, ax2, ax3) = plt.subplots(3, 1,figsize=[15, 30])
+
+wordcloud1 = WordCloud(background_color='white', colormap= cmap, mask = transformed_mask, collocations=False, normalize_plurals=False,
+                       random_state = 42, width=mask.shape[1], height=mask.shape[0]).generate(" ".join(alfagift_label.query("sentiment == 'positif'")["clean"]))
+
+plt.imshow(wordcloud1, interpolation='bilinear')
+plt.axis('off')
+plt.show()
+
